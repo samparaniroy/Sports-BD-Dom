@@ -1,11 +1,22 @@
 const allPlayers = () =>{
+    document.getElementById('player-container').innerHTML ='';
+    document.getElementById('spinner').style.display = 'block';
     const searchValue = document.getElementById('search-box').value;
     searchValue.value ='';
     const url = `https://www.thesportsdb.com/api/v1/json/2/searchplayers.php?p=${searchValue}`
     // console.log(url)
     fetch(url)
     .then(response => response.json())
-    .then(data => showPlayerDetails(data.player))
+    .then(data =>{
+        console.log(data.player == null);
+        if(data.player == null){
+            document.getElementById('spinner').style.display = 'block';
+        }
+        else{
+            showPlayerDetails (data.player)
+            document.getElementById('spinner').style.display = 'none';
+        }
+    });
     // console.log(searchValue)
 };
 const showPlayerDetails = (players) => {
@@ -22,10 +33,33 @@ const showPlayerDetails = (players) => {
         <p></p>
         <div class="allButton">
             <button class="btn btn-danger">Button</button>
-            <button class="btn btn-danger">Details</button>
+            <button onclick ="details('${player.idPlayer}')" class="btn btn-danger">Details</button>
         </div>
         </div>
         `
         parent.appendChild(div)
     }
+}
+const details = (id) =>{
+    const url = `https://www.thesportsdb.com/api/v1/json/2/lookupplayer.php?id=${id}`
+    fetch(url)
+    .then(response => response.json())
+    .then(data => setDetails(data.players[0]))
+}
+const setDetails = (info) => {
+    console.log(info)
+    if(info.strGender =='Male'){
+        document.getElementById('male').style.display ='block'
+        document.getElementById('female').style.display ='none'
+    }
+    else{
+        document.getElementById('male').style.display ='none'
+        document.getElementById('female').style.display ='block'
+    }
+    document.getElementById('details-container').innerHTML = `
+       <div>
+       <img src="" alt="">  
+       <h1>Name: ${info.strPlayer}</h1>
+       </div>
+    `;
 }
